@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .section {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📚 Library Management System</h1>
+
+<div class="container">
+
+    <!-- Add Book -->
+    <div class="section">
+        <h3>Add Book</h3>
+        <input id="bookId" placeholder="Book ID">
+        <input id="bookName" placeholder="Book Name">
+        <input id="bookAuthor" placeholder="Author Name">
+        <input id="bookQty" type="number" placeholder="Quantity">
+        <button onclick="addBook()">Add Book</button>
+    </div>
+
+    <!-- View Books -->
+    <div class="section">
+        <h3>Books List</h3>
+        <table id="bookTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Author</th>
+                <th>Quantity</th>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Add Student -->
+    <div class="section">
+        <h3>Add Student</h3>
+        <input id="studentId" placeholder="Student ID">
+        <input id="studentName" placeholder="Student Name">
+        <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <!-- View Students -->
+    <div class="section">
+        <h3>Students List</h3>
+        <table id="studentTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    let books = {};
+    let students = {};
+
+    function addBook() {
+        let id = document.getElementById("bookId").value;
+        let name = document.getElementById("bookName").value;
+        let author = document.getElementById("bookAuthor").value;
+        let qty = document.getElementById("bookQty").value;
+
+        if (id === "" || name === "" || author === "" || qty === "") {
+            alert("Please fill all book fields");
+            return;
+        }
+
+        books[id] = { name, author, qty };
+        updateBooks();
+        alert("Book added successfully");
+    }
+
+    function updateBooks() {
+        let table = document.getElementById("bookTable");
+        table.innerHTML = `
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Author</th>
+                <th>Quantity</th>
+            </tr>
+        `;
+
+        for (let id in books) {
+            let row = table.insertRow();
+            row.insertCell(0).innerText = id;
+            row.insertCell(1).innerText = books[id].name;
+            row.insertCell(2).innerText = books[id].author;
+            row.insertCell(3).innerText = books[id].qty;
+        }
+    }
+
+    function addStudent() {
+        let id = document.getElementById("studentId").value;
+        let name = document.getElementById("studentName").value;
+
+        if (id === "" || name === "") {
+            alert("Please fill all student fields");
+            return;
+        }
+
+        students[id] = name;
+        updateStudents();
+        alert("Student added successfully");
+    }
+
+    function updateStudents() {
+        let table = document.getElementById("studentTable");
+        table.innerHTML = `
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        `;
+
+        for (let id in students) {
+            let row = table.insertRow();
+            row.insertCell(0).innerText = id;
+            row.insertCell(1).innerText = students[id];
+        }
+    }
+</script>
+
+</body>
+</html>
