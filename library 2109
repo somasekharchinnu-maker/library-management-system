@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Library Management System</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#eef2ff;
+    padding:20px;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+h1{
+    text-align:center;
+    color:#3730a3;
+}
+.menu button{
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:5px;
+    background:#4f46e5;
+    color:white;
+    cursor:pointer;
+}
+.menu button:hover{
+    background:#312e81;
+}
+.section{
+    display:none;
+    margin-top:20px;
+}
+input{
+    width:100%;
+    padding:8px;
+    margin:5px 0;
+}
+button.action{
+    background:#22c55e;
+    color:white;
+    padding:8px 15px;
+    border:none;
+    border-radius:5px;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+.msg{font-weight:bold;margin-top:8px;}
+.success{color:green;}
+.error{color:red;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>📘 Library Management System</h1>
+
+<div class="menu">
+    <button onclick="show('addBook')">Add Book</button>
+    <button onclick="show('viewBooks')">View Books</button>
+    <button onclick="show('addStudent')">Add Student</button>
+    <button onclick="show('viewStudents')">View Students</button>
+    <button onclick="show('issueBook')">Issue Book</button>
+    <button onclick="show('returnBook')">Return Book</button>
+</div>
+
+<!-- ADD BOOK -->
+<div class="section" id="addBook">
+<h3>Add Book</h3>
+<input id="bookId" placeholder="Book ID">
+<input id="bookName" placeholder="Book Name">
+<input id="authorName" placeholder="Author Name">
+<input id="quantity" type="number" placeholder="Quantity">
+<button class="action" onclick="addBook()">Add Book</button>
+<div id="bookMsg" class="msg"></div>
+</div>
+
+<!-- VIEW BOOKS -->
+<div class="section" id="viewBooks">
+<h3>Available Books</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Author</th><th>Quantity</th></tr>
+</thead>
+<tbody id="booksTable"></tbody>
+</table>
+</div>
+
+<!-- ADD STUDENT -->
+<div class="section" id="addStudent">
+<h3>Add Student</h3>
+<input id="studentId" placeholder="Student ID">
+<input id="studentName" placeholder="Student Name">
+<button class="action" onclick="addStudent()">Add Student</button>
+<div id="studentMsg" class="msg"></div>
+</div>
+
+<!-- VIEW STUDENTS -->
+<div class="section" id="viewStudents">
+<h3>Students List</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th></tr>
+</thead>
+<tbody id="studentsTable"></tbody>
+</table>
+</div>
+
+<!-- ISSUE BOOK -->
+<div class="section" id="issueBook">
+<h3>Issue Book</h3>
+<input id="issueBookId" placeholder="Book ID">
+<input id="issueStudentId" placeholder="Student ID">
+<button class="action" onclick="issueBook()">Issue</button>
+<div id="issueMsg" class="msg"></div>
+</div>
+
+<!-- RETURN BOOK -->
+<div class="section" id="returnBook">
+<h3>Return Book</h3>
+<input id="returnBookId" placeholder="Book ID">
+<button class="action" onclick="returnBook()">Return</button>
+<div id="returnMsg" class="msg"></div>
+</div>
+
+</div>
+
+<script>
+/* LOAD DATA FROM STORAGE */
+let books = JSON.parse(localStorage.getItem("books")) || {};
+let students = JSON.parse(localStorage.getItem("students")) || {};
+let issuedBooks = JSON.parse(localStorage.getItem("issuedBooks")) || {};
+
+function saveData(){
+    localStorage.setItem("books",JSON.stringify(books));
+    localStorage.setItem("students",JSON.stringify(students));
+    localStorage.setItem("issuedBooks",JSON.stringify(issuedBooks));
+}
+
+function show(id){
+    document.querySelectorAll(".section").forEach(s=>s.style.display="none");
+    document.getElementById(id).style.display="block";
+    if(id==="viewBooks") loadBooks();
+    if(id==="viewStudents") loadStudents();
+}
+
+/* ADD BOOK */
+function addBook(){
+    let id=bookId.value;
+    let name=bookName.value;
+    let author=authorName.value;
+    let qty=parseInt(quantity.value);
+
+    if(!id||!name||!author||qty<=0){
+        bookMsg.textContent="❌ Invalid input";
+        bookMsg.className="msg error";return;
+    }
+
+    books[id]={name,author,quantity:qty};
+    saveData();
+    bookMsg.textContent="✅ Book Added Successfully";
+    bookMsg.className="msg success";
+}
+
+/* VIEW BOOKS */
+function loadBooks(){
+    booksTable.innerHTML="";
+    for(let id in books){
+        let b=books[id];
+        booksTable.innerHTML+=
+        `<tr><td>${id}</td><td>${b.name}</td><td>${b.author}</td><td>${b.quantity}</td></tr>`;
+    }
+}
+
+/* ADD STUDENT */
+function addStudent(){
+    let id=studentId.value;
+    let name=studentName.value;
+
+    if(!id||!name){
+        studentMsg.textContent="❌ Invalid input";
+        studentMsg.className="msg error";return;
+    }
+
+    students[id]=name;
+    saveData();
+    studentMsg.textContent="✅ Student Added Successfully";
+    studentMsg.className="msg success";
+}
+
+/* VIEW STUDENTS */
+function loadStudents(){
+    studentsTable.innerHTML="";
+    for(let id in students){
+        studentsTable.innerHTML+=
+        `<tr><td>${id}</td><td>${students[id]}</td></tr>`;
+    }
+}
+
+/* ISSUE BOOK */
+function issueBook(){
+    let bid=issueBookId.value;
+    let sid=issueStudentId.value;
+
+    if(!books[bid]||!students[sid]||books[bid].quantity<=0){
+        issueMsg.textContent="❌ Issue failed";
+        issueMsg.className="msg error";return;
+    }
+
+    books[bid].quantity--;
+    issuedBooks[bid]=sid;
+    saveData();
+    issueMsg.textContent="✅ Book Issued Successfully";
+    issueMsg.className="msg success";
+}
+
+/* RETURN BOOK */
+function returnBook(){
+    let bid=returnBookId.value;
+
+    if(!issuedBooks[bid]){
+        returnMsg.textContent="❌ Book not issued";
+        returnMsg.className="msg error";return;
+    }
+
+    books[bid].quantity++;
+    delete issuedBooks[bid];
+    saveData();
+    returnMsg.textContent="✅ Book Returned Successfully";
+    returnMsg.className="msg success";
+}
+</script>
+
+</body>
+</html>
