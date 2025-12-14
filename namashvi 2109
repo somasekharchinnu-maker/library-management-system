@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .menu, .section {
+            background: #ffffff;
+            padding: 15px;
+            margin: 15px auto;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 8px 15px;
+            margin: 5px 0;
+            cursor: pointer;
+            background-color: #3498db;
+            border: none;
+            color: white;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input {
+            width: 95%;
+            padding: 7px;
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #aaa;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .msg {
+            margin-top: 10px;
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📘 Library Management System</h1>
+
+<div class="menu">
+    <button onclick="showSection('addBook')">Add Book</button>
+    <button onclick="showSection('viewBooks')">View Books</button>
+    <button onclick="showSection('addStudent')">Add Student</button>
+    <button onclick="showSection('viewStudents')">View Students</button>
+    <button onclick="showSection('issueBook')">Issue Book</button>
+    <button onclick="showSection('returnBook')">Return Book</button>
+</div>
+
+<!-- Add Book -->
+<div class="section hidden" id="addBook">
+    <h3>Add Book</h3>
+    <input id="bookId" placeholder="Book ID">
+    <input id="bookName" placeholder="Book Name">
+    <input id="authorName" placeholder="Author Name">
+    <input id="quantity" type="number" placeholder="Quantity">
+    <button onclick="addBook()">Add Book</button>
+    <div class="msg" id="addBookMsg"></div>
+</div>
+
+<!-- View Books -->
+<div class="section hidden" id="viewBooks">
+    <h3>Available Books</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Author</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody id="booksTable"></tbody>
+    </table>
+</div>
+
+<!-- Add Student -->
+<div class="section hidden" id="addStudent">
+    <h3>Add Student</h3>
+    <input id="studentId" placeholder="Student ID">
+    <input id="studentName" placeholder="Student Name">
+    <button onclick="addStudent()">Add Student</button>
+    <div class="msg" id="addStudentMsg"></div>
+</div>
+
+<!-- View Students -->
+<div class="section hidden" id="viewStudents">
+    <h3>Student List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+    </table>
+</div>
+
+<!-- Issue Book -->
+<div class="section hidden" id="issueBook">
+    <h3>Issue Book</h3>
+    <input id="issueBookId" placeholder="Book ID">
+    <input id="issueStudentId" placeholder="Student ID">
+    <button onclick="issueBook()">Issue</button>
+    <div class="msg" id="issueMsg"></div>
+</div>
+
+<!-- Return Book -->
+<div class="section hidden" id="returnBook">
+    <h3>Return Book</h3>
+    <input id="returnBookId" placeholder="Book ID">
+    <button onclick="returnBook()">Return</button>
+    <div class="msg" id="returnMsg"></div>
+</div>
+
+<script>
+    let books = {};
+    let students = {};
+    let issuedBooks = {};
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+
+        if (id === 'viewBooks') displayBooks();
+        if (id === 'viewStudents') displayStudents();
+    }
+
+    function addBook() {
+        let id = bookId.value;
+        let name = bookName.value;
+        let author = authorName.value;
+        let qty = parseInt(quantity.value);
+
+        if (!id || !name || !author || qty <= 0) {
+            addBookMsg.innerHTML = "❌ Invalid input";
+            addBookMsg.className = "msg error";
+            return;
+        }
+
+        books[id] = { name, author, quantity: qty };
+        addBookMsg.innerHTML = "✅ Book Added Successfully";
+        addBookMsg.className = "msg";
+    }
+
+    function displayBooks() {
+        let table = booksTable;
+        table.innerHTML = "";
+        for (let id in books) {
+            table.innerHTML += `
+                <tr>
+                    <td>${id}</td>
+                    <td>${books[id].name}</td>
+                    <td>${books[id].author}</td>
+                    <td>${books[id].quantity}</td>
+                </tr>`;
+        }
+    }
+
+    function addStudent() {
+        let id = studentId.value;
+        let name = studentName.value;
+
+        if (!id || !name) {
+            addStudentMsg.innerHTML = "❌ Invalid input";
+            addStudentMsg.className = "msg error";
+            return;
+        }
+
+        students[id] = name;
+        addStudentMsg.innerHTML = "✅ Student Added Successfully";
+        addStudentMsg.className = "msg";
+    }
+
+    function displayStudents() {
+        let table = studentsTable;
+        table.innerHTML = "";
+        for (let id in students) {
+            table.innerHTML += `
+                <tr>
+                    <td>${id}</td>
+                    <td>${students[id]}</td>
+                </tr>`;
+        }
+    }
+
+    function issueBook() {
+        let bookIdVal = issueBookId.value;
+        let studentIdVal = issueStudentId.value;
+
+        if (!books[bookIdVal]) {
+            issueMsg.innerHTML = "❌ Book not found";
+            issueMsg.className = "msg error";
+            return;
+        }
+        if (!students[studentIdVal]) {
+            issueMsg.innerHTML = "❌ Student not found";
+            issueMsg.className = "msg error";
+            return;
+        }
+        if (books[bookIdVal].quantity <= 0) {
+            issueMsg.innerHTML = "❌ Book not available";
+            issueMsg.className = "msg error";
+            return;
+        }
+
+        books[bookIdVal].quantity--;
+        issuedBooks[bookIdVal] = studentIdVal;
+        issueMsg.innerHTML = "✅ Book Issued Successfully";
+        issueMsg.className = "msg";
+    }
+
+    function returnBook() {
+        let bookIdVal = returnBookId.value;
+
+        if (!issuedBooks[bookIdVal]) {
+            returnMsg.innerHTML = "❌ Book not issued";
+            returnMsg.className = "msg error";
+            return;
+        }
+
+        books[bookIdVal].quantity++;
+        delete issuedBooks[bookIdVal];
+        returnMsg.innerHTML = "✅ Book Returned Successfully";
+        returnMsg.className = "msg";
+    }
+</script>
+
+</body>
+</html>
